@@ -1,8 +1,14 @@
+import { useState } from "react";
 import { useAllContent } from "@/hooks/useContent";
 import { useUsers, useTransactions } from "@/hooks/useUsers";
-import { Film, Tv, Users, CreditCard, Clock, Loader2 } from "lucide-react";
+import { Film, Tv, Users, CreditCard, Clock, Loader2, Key, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
+  const { toast } = useToast();
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const { content, loading: contentLoading } = useAllContent();
   const { users, loading: usersLoading } = useUsers();
   const { transactions, loading: txLoading } = useTransactions();
@@ -73,6 +79,53 @@ const AdminDashboard = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Change Password */}
+          <div className="mt-8">
+            <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+              <Key className="w-5 h-5 text-primary" /> Change Admin Password
+            </h2>
+            <div className="bg-card border border-border rounded-xl p-4 max-w-md space-y-3">
+              <div className="relative">
+                <input
+                  type={showPw ? "text" : "password"}
+                  value={currentPw}
+                  onChange={e => setCurrentPw(e.target.value)}
+                  placeholder="Current password"
+                  className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border pr-10"
+                />
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <input
+                type={showPw ? "text" : "password"}
+                value={newPw}
+                onChange={e => setNewPw(e.target.value)}
+                placeholder="New password"
+                className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border"
+              />
+              <button
+                onClick={() => {
+                  const stored = localStorage.getItem("admin_panel_password") || "admin123";
+                  if (currentPw !== stored) {
+                    toast({ title: "Wrong current password", variant: "destructive" });
+                    return;
+                  }
+                  if (newPw.trim().length < 4) {
+                    toast({ title: "Password too short", description: "Minimum 4 characters.", variant: "destructive" });
+                    return;
+                  }
+                  localStorage.setItem("admin_panel_password", newPw.trim());
+                  setCurrentPw(""); setNewPw("");
+                  toast({ title: "Password updated!" });
+                }}
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors"
+              >
+                Update Password
+              </button>
+            </div>
           </div>
         </>
       )}
