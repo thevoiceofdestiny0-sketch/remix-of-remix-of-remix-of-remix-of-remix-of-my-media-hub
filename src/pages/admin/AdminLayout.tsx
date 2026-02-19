@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, Navigate } from "react-router-dom";
 import { Film, Tv, Users, CreditCard, Wallet, LayoutDashboard, ListVideo, Crown, ImageIcon } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const sidebarItems = [
   { label: "Dashboard", path: "/admin", icon: LayoutDashboard, end: true },
@@ -14,6 +15,20 @@ const sidebarItems = [
 ];
 
 const AdminLayout = () => {
+  const { user, profile, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
