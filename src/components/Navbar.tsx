@@ -37,7 +37,10 @@ const Navbar = () => {
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
               <img src="/logo.png" alt="DWON PA DESTINY" className="w-8 h-8 rounded-full object-cover" />
-              <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">DWON PA DESTINY.ONLINE</span>
+              <div className="flex flex-col">
+                <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">DWON PA DESTINY.ONLINE</span>
+                <span className="text-[9px] text-muted-foreground leading-tight">0782898630 | 0394803113</span>
+              </div>
             </Link>
             <div className="hidden md:flex items-center gap-1">
               {navItems.map((item) => (
