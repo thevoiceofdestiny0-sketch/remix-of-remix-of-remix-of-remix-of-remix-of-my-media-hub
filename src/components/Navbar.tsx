@@ -35,8 +35,9 @@ const Navbar = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
         <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-8">
-            <Link to="/" className="text-base md:text-2xl font-black text-gradient-green tracking-tight leading-tight">
-              DWON PA DESTINY
+            <Link to="/" className="flex items-center gap-2">
+              <img src="/logo.png" alt="VJ SONY" className="w-8 h-8 rounded-full object-cover" />
+              <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">VJ SONY</span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
               {navItems.map((item) => (
