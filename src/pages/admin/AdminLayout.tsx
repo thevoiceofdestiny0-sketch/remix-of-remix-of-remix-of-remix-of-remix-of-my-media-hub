@@ -34,7 +34,10 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="w-56 bg-card border-r border-border flex flex-col py-4 sticky top-0 h-screen">
         <div className="px-4 mb-6">
-          <h1 className="text-lg font-black text-gradient-green tracking-tight">DWON PA DESTINY</h1>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="VJ SONY" className="w-7 h-7 rounded-full object-cover" />
+            <h1 className="text-lg font-black text-gradient-green tracking-tight">VJ SONY</h1>
+          </div>
           <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Admin Panel</p>
         </div>
         <nav className="flex-1 px-2 space-y-0.5">
