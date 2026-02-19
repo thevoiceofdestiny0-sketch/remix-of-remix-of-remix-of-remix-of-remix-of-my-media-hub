@@ -60,7 +60,7 @@ const Index = () => {
                 {filtered.map((c) => (
                   <Link
                     key={c.id}
-                    to={`/watch/${c.id}`}
+                    to={`/movie/${c.id}`}
                     className="group rounded-lg overflow-hidden hover:scale-105 transition-transform"
                   >
                     <div className="relative h-[160px] sm:h-[200px]">

@@ -62,7 +62,7 @@ const Browse = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {filtered.map(c => (
-              <Link key={c.id} to={`/watch/${c.id}`} className="group rounded-lg overflow-hidden hover:scale-105 transition-transform">
+              <Link key={c.id} to={`/movie/${c.id}`} className="group rounded-lg overflow-hidden hover:scale-105 transition-transform">
                 <div className="relative h-[240px]">
                   <img src={c.poster} alt={c.title} className="w-full h-full object-cover" loading="lazy" />
                   <span className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-primary/80 text-primary-foreground capitalize">{c.type}</span>
