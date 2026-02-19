@@ -32,6 +32,7 @@ export interface Content {
   title: string;
   poster: string;
   videoUrl?: string;
+  trailerUrl?: string;
   type: ContentType;
   status: ContentStatus;
   rating: number;
