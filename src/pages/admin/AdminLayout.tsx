@@ -35,8 +35,8 @@ const AdminLayout = () => {
       <aside className="w-56 bg-card border-r border-border flex flex-col py-4 sticky top-0 h-screen">
         <div className="px-4 mb-6">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="VJ SONY" className="w-7 h-7 rounded-full object-cover" />
-            <h1 className="text-lg font-black text-gradient-green tracking-tight">VJ SONY</h1>
+            <img src="/logo.png" alt="DWON PA DESTINY" className="w-7 h-7 rounded-full object-cover" />
+            <h1 className="text-sm font-black text-gradient-green tracking-tight">DWON PA DESTINY.ONLINE</h1>
           </div>
           <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Admin Panel</p>
         </div>
