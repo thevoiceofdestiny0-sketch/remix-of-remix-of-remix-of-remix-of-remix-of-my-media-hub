@@ -38,7 +38,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center gap-2">
               <img src="/logo.png" alt="DWON PA DESTINY" className="w-8 h-8 rounded-full object-cover" />
               <div className="flex flex-col">
-                <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">DWON PA DESTINY.ONLINE</span>
+                <span className="text-[11px] md:text-lg font-black text-gradient-green tracking-tight leading-tight whitespace-nowrap">DWON PA DESTINY.ONLINE</span>
                 <span className="text-[10px] md:text-xs font-semibold tracking-wide leading-tight">
                   <span className="text-primary">📞</span>{" "}
                   <span className="text-foreground/80">0782898630</span>
