@@ -12,7 +12,7 @@ const MovieCard = ({ movie, showRank, size = "default" }: MovieCardProps) => {
 
   return (
     <Link
-      to={`/watch/${movie.id}`}
+      to={`/movie/${movie.id}`}
       className={`group relative flex-shrink-0 rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105 ${
         isLarge ? "w-[150px]" : "w-[120px]"
       }`}

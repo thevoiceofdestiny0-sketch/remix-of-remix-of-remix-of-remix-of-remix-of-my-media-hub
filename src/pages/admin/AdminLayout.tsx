@@ -1,6 +1,7 @@
 import { NavLink, Outlet, Navigate } from "react-router-dom";
 import { Film, Tv, Users, CreditCard, Wallet, LayoutDashboard, ListVideo, Crown, ImageIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import AdminMobileNav from "@/components/AdminMobileNav";
 
 const sidebarItems = [
   { label: "Dashboard", path: "/admin", icon: LayoutDashboard, end: true },
@@ -31,8 +32,8 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-56 bg-card border-r border-border flex flex-col py-4 sticky top-0 h-screen">
+      {/* Sidebar - hidden on mobile */}
+      <aside className="hidden md:flex w-56 bg-card border-r border-border flex-col py-4 sticky top-0 h-screen">
         <div className="px-4 mb-6">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="DWON PA DESTINY" className="w-7 h-7 rounded-full object-cover" />
@@ -65,9 +66,20 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-6 overflow-auto">
+      <main className="flex-1 p-4 md:p-6 overflow-auto pb-24 md:pb-6">
+        {/* Mobile header */}
+        <div className="md:hidden flex items-center gap-2 mb-4">
+          <img src="/logo.png" alt="DWON PA DESTINY" className="w-7 h-7 rounded-full object-cover" />
+          <div>
+            <h1 className="text-sm font-black text-gradient-green tracking-tight">DWON PA DESTINY.ONLINE</h1>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-widest">Admin Panel</p>
+          </div>
+        </div>
         <Outlet />
       </main>
+
+      {/* Mobile bottom nav */}
+      <AdminMobileNav />
     </div>
   );
 };

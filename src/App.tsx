@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Movies from "./pages/Movies";
 import Series from "./pages/Series";
 import Watch from "./pages/Watch";
+import MovieDetail from "./pages/MovieDetail";
 import Subscription from "./pages/Subscription";
 import Agent from "./pages/Agent";
 import Browse from "./pages/Browse";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/movies" element={<Movies />} />
             <Route path="/series" element={<Series />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
             <Route path="/watch/:id" element={<Watch />} />
             <Route path="/subscription" element={<Subscription />} />
             <Route path="/agent" element={<Agent />} />

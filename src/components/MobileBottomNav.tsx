@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Film, Tv, Sparkles, User } from "lucide-react";
+import { Home, Film, Tv, Sparkles, User, Shield } from "lucide-react";
 import { useState } from "react";
 import LoginModal from "./LoginModal";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,7 +13,7 @@ const navItems = [
 
 const MobileBottomNav = () => {
   const location = useLocation();
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
 
   const isActive = (path: string) => {
@@ -52,6 +52,31 @@ const MobileBottomNav = () => {
               </Link>
             );
           })}
+
+          {/* Admin link for admins */}
+          {user && isAdmin() && (
+            <Link
+              to="/admin"
+              className="flex flex-col items-center gap-0.5 min-w-[56px] group"
+            >
+              <div
+                className={`flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-200 ${
+                  location.pathname.startsWith("/admin")
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105"
+                    : "text-muted-foreground group-hover:text-foreground group-hover:bg-secondary"
+                }`}
+              >
+                <Shield className="w-5 h-5" strokeWidth={location.pathname.startsWith("/admin") ? 2.5 : 2} />
+              </div>
+              <span
+                className={`text-[10px] font-medium transition-colors ${
+                  location.pathname.startsWith("/admin") ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                Admin
+              </span>
+            </Link>
+          )}
 
           {/* Account */}
           {user ? (

@@ -18,6 +18,7 @@ const AdminMovies = () => {
   const [isVip, setIsVip] = useState(false);
   const [isNew, setIsNew] = useState(true);
   const [isAgent, setIsAgent] = useState(false);
+  const [trailerUrl, setTrailerUrl] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const handleAdd = async () => {
@@ -28,6 +29,7 @@ const AdminMovies = () => {
         title,
         poster: posterUrl.trim() || "https://placehold.co/300x450/111/22c55e?text=" + encodeURIComponent(title),
         videoUrl: videoUrl.trim() || undefined,
+        trailerUrl: trailerUrl.trim() || undefined,
         type: "movie",
         status: isAgent ? "agent" : "published",
         rating: 8.0,
@@ -40,7 +42,7 @@ const AdminMovies = () => {
       };
       await addContent(newMovie);
       toast({ title: "Movie added", description: isAgent ? "Sent to agent review." : "Published." });
-      setTitle(""); setPosterUrl(""); setVideoUrl(""); setDescription("");
+      setTitle(""); setPosterUrl(""); setVideoUrl(""); setDescription(""); setTrailerUrl("");
       setShowForm(false);
       refetch();
     } catch {
@@ -82,6 +84,7 @@ const AdminMovies = () => {
           <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" rows={2} className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border resize-none" />
           <input value={posterUrl} onChange={e => setPosterUrl(e.target.value)} placeholder="Poster URL" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
           <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="Video URL (direct MP4 or streaming URL)" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
+          <input value={trailerUrl} onChange={e => setTrailerUrl(e.target.value)} placeholder="Trailer URL (optional)" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
           <div className="flex gap-4">
             <label className="flex items-center gap-2 text-sm text-foreground">
               <input type="checkbox" checked={isVip} onChange={e => setIsVip(e.target.checked)} className="rounded" /> VIP Only
