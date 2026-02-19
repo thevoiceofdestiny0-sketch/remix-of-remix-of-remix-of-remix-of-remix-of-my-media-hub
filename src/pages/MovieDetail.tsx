@@ -58,11 +58,20 @@ const MovieDetail = () => {
 
       {/* Hero banner - carousel style */}
       <div className="relative mt-14 w-full h-[280px] sm:h-[340px] md:h-[420px] overflow-hidden">
-        <img
-          src={content.poster}
-          alt={content.title}
-          className="w-full h-full object-cover object-top"
-        />
+        {trailerOpen && trailerUrl ? (
+          <iframe
+            src={getDriveEmbedUrl(trailerUrl)}
+            className="w-full h-full"
+            allowFullScreen
+            allow="autoplay; encrypted-media"
+          />
+        ) : (
+          <img
+            src={content.poster}
+            alt={content.title}
+            className="w-full h-full object-cover object-top"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
 
@@ -121,14 +130,18 @@ const MovieDetail = () => {
             <button
               onClick={() => {
                 if (trailerUrl) {
-                  setTrailerOpen(true);
+                  setTrailerOpen(!trailerOpen);
                 } else {
                   toast({ title: "No trailer available", description: "Trailer has not been uploaded yet." });
                 }
               }}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-sm text-foreground font-bold text-sm hover:bg-white/20 transition-colors border border-border/50"
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-colors border border-border/50 ${
+                trailerOpen
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-white/10 backdrop-blur-sm text-foreground hover:bg-white/20"
+              }`}
             >
-              <Film className="w-4 h-4" /> Play Trailer
+              <Film className="w-4 h-4" /> {trailerOpen ? "Show Poster" : "Play Trailer"}
             </button>
 
             <button
@@ -144,24 +157,6 @@ const MovieDetail = () => {
         </div>
       </div>
 
-      {/* Trailer modal */}
-      {trailerOpen && trailerUrl && (
-        <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4" onClick={() => setTrailerOpen(false)}>
-          <div className="w-full max-w-3xl" onClick={e => e.stopPropagation()}>
-            <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
-              <iframe
-                src={getDriveEmbedUrl(trailerUrl)}
-                className="w-full h-full"
-                allowFullScreen
-                allow="autoplay; encrypted-media"
-              />
-            </div>
-            <button onClick={() => setTrailerOpen(false)} className="mt-3 mx-auto block text-sm text-muted-foreground hover:text-foreground">
-              Close Trailer
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Related */}
       <div className="max-w-[1400px] mx-auto px-4 py-6">
