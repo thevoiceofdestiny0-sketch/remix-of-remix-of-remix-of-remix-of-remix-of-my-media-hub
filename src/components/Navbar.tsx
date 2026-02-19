@@ -39,7 +39,12 @@ const Navbar = () => {
               <img src="/logo.png" alt="DWON PA DESTINY" className="w-8 h-8 rounded-full object-cover" />
               <div className="flex flex-col">
                 <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">DWON PA DESTINY.ONLINE</span>
-                <span className="text-[9px] text-muted-foreground leading-tight">0782898630 | 0394803113</span>
+                <span className="text-[10px] md:text-xs font-semibold tracking-wide leading-tight">
+                  <span className="text-primary">📞</span>{" "}
+                  <span className="text-foreground/80">0782898630</span>
+                  <span className="text-muted-foreground mx-1">•</span>
+                  <span className="text-foreground/80">0394803113</span>
+                </span>
               </div>
             </Link>
             <div className="hidden md:flex items-center gap-1">
