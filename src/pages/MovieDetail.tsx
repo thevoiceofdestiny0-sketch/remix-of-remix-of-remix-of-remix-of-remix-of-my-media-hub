@@ -56,94 +56,90 @@ const MovieDetail = () => {
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
 
-      {/* Hero poster area */}
-      <div className="relative mt-14">
-        {/* Poster background blur */}
-        <div className="absolute inset-0 overflow-hidden">
-          <img src={content.poster} alt="" className="w-full h-full object-cover scale-110 blur-2xl opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
-        </div>
+      {/* Hero banner - carousel style */}
+      <div className="relative mt-14 w-full h-[280px] sm:h-[340px] md:h-[420px] overflow-hidden">
+        <img
+          src={content.poster}
+          alt={content.title}
+          className="w-full h-full object-cover object-top"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
 
-        <div className="relative max-w-[1400px] mx-auto px-4 pt-6 pb-8">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Back
-          </button>
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 flex items-center gap-1 text-sm text-foreground/80 hover:text-foreground bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full transition-colors z-10"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
 
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Poster */}
-            <div className="flex-shrink-0 mx-auto md:mx-0">
-              <div className="w-[200px] md:w-[250px] rounded-xl overflow-hidden shadow-2xl shadow-black/40 border border-border/30">
-                <img src={content.poster} alt={content.title} className="w-full aspect-[2/3] object-cover" />
-              </div>
-            </div>
+        {/* Content overlay */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 max-w-[1400px] mx-auto">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            {content.isVip && (
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-badge-vip text-primary-foreground">VIP</span>
+            )}
+            {content.isNew && (
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-badge-hot text-primary-foreground">NEW</span>
+            )}
+            {content.type === "series" && (
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-primary text-primary-foreground">
+                {content.episodes?.length || 0} Episodes
+              </span>
+            )}
+          </div>
 
-            {/* Details */}
-            <div className="flex-1 flex flex-col justify-end">
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                {content.isVip && (
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-badge-vip text-primary-foreground">VIP</span>
-                )}
-                {content.isNew && (
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-badge-hot text-primary-foreground">NEW</span>
-                )}
-                {content.type === "series" && (
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-primary text-primary-foreground">
-                    {content.episodes?.length || 0} Episodes
-                  </span>
-                )}
-              </div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground mb-2 leading-tight">{content.title}</h1>
 
-              <h1 className="text-2xl md:text-3xl font-black text-foreground mb-2">{content.title}</h1>
+          <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3 flex-wrap">
+            <span className="flex items-center gap-1 text-badge-vip font-semibold">
+              <Star className="w-4 h-4 fill-current" /> {content.rating}
+            </span>
+            <span>{content.year}</span>
+            <span className="capitalize">{content.type}</span>
+            {content.genres.map(g => (
+              <span key={g} className="px-2 py-0.5 rounded-full bg-secondary/80 text-[11px] text-muted-foreground">{g}</span>
+            ))}
+          </div>
 
-              <div className="flex items-center gap-3 text-sm text-muted-foreground mb-3 flex-wrap">
-                <span className="flex items-center gap-1 text-badge-vip font-semibold">
-                  <Star className="w-4 h-4 fill-current" /> {content.rating}
-                </span>
-                <span>{content.year}</span>
-                <span className="capitalize">{content.type}</span>
-              </div>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed mb-4 max-w-xl line-clamp-2 md:line-clamp-3">{content.description}</p>
 
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {content.genres.map(g => (
-                  <span key={g} className="px-2.5 py-1 rounded-full bg-secondary text-xs text-muted-foreground">{g}</span>
-                ))}
-              </div>
+          {/* Action buttons */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={handleWatch}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30"
+            >
+              {hasSubscription || isAdmin() ? (
+                <><Play className="w-4 h-4 fill-current" /> Watch Now</>
+              ) : (
+                <><Lock className="w-4 h-4" /> Subscribe to Watch</>
+              )}
+            </button>
 
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-xl">{content.description}</p>
+            <button
+              onClick={() => {
+                if (trailerUrl) {
+                  setTrailerOpen(true);
+                } else {
+                  toast({ title: "No trailer available", description: "Trailer has not been uploaded yet." });
+                }
+              }}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-sm text-foreground font-bold text-sm hover:bg-white/20 transition-colors border border-border/50"
+            >
+              <Film className="w-4 h-4" /> Play Trailer
+            </button>
 
-              {/* Action buttons */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <button
-                  onClick={handleWatch}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors shadow-lg shadow-primary/30"
-                >
-                  {hasSubscription || isAdmin() ? (
-                    <><Play className="w-4 h-4 fill-current" /> Watch Now</>
-                  ) : (
-                    <><Lock className="w-4 h-4" /> Subscribe to Watch</>
-                  )}
-                </button>
-
-                {trailerUrl && (
-                  <button
-                    onClick={() => setTrailerOpen(true)}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-secondary text-foreground font-bold text-sm hover:bg-secondary/80 transition-colors border border-border"
-                  >
-                    <Film className="w-4 h-4" /> Play Trailer
-                  </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    navigator.clipboard?.writeText(window.location.href);
-                    toast({ title: "Link copied!" });
-                  }}
-                  className="p-2.5 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors border border-border"
-                >
-                  <Share2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard?.writeText(window.location.href);
+                toast({ title: "Link copied!" });
+              }}
+              className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm text-foreground hover:bg-white/20 transition-colors border border-border/50"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
