@@ -35,7 +35,7 @@ const Series = () => {
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
             {filtered.map(s => (
-              <Link key={s.id} to={`/watch/${s.id}`} className="group rounded-lg overflow-hidden hover:scale-105 transition-transform">
+              <Link key={s.id} to={`/movie/${s.id}`} className="group rounded-lg overflow-hidden hover:scale-105 transition-transform">
                 <div className="relative h-[160px] sm:h-[200px]">
                   <img src={s.poster} alt={s.title} className="w-full h-full object-cover" loading="lazy" />
                   <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[9px] font-bold rounded bg-primary/80 text-primary-foreground capitalize">
