@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useAllContent, addContent, deleteContent, type Content } from "@/hooks/useContent";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { useAllContent, addContent, deleteContent, updateContent, type Content } from "@/hooks/useContent";
+import { Plus, Trash2, Loader2, Pencil, X, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminMovies = () => {
@@ -20,6 +20,41 @@ const AdminMovies = () => {
   const [isAgent, setIsAgent] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
+
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState<Partial<Content>>({});
+
+  const startEdit = (movie: Content) => {
+    setEditingId(movie.id);
+    setEditData({
+      title: movie.title,
+      year: movie.year,
+      genres: movie.genres,
+      poster: movie.poster,
+      videoUrl: movie.videoUrl || "",
+      trailerUrl: movie.trailerUrl || "",
+      description: movie.description,
+      isVip: movie.isVip,
+      isNew: movie.isNew,
+      status: movie.status,
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!editingId) return;
+    setSaving(true);
+    try {
+      await updateContent(editingId, editData);
+      toast({ title: "Movie updated" });
+      setEditingId(null);
+      refetch();
+    } catch {
+      toast({ title: "Error updating movie", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleAdd = async () => {
     if (!title.trim()) return;
@@ -102,6 +137,41 @@ const AdminMovies = () => {
         </div>
       )}
 
+      {/* Edit Form */}
+      {editingId && (
+        <div className="bg-card border-2 border-primary rounded-xl p-4 mb-6 space-y-3">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-bold text-primary">✏️ Editing Movie</h2>
+            <button onClick={() => setEditingId(null)} className="p-1 rounded hover:bg-secondary"><X className="w-4 h-4 text-muted-foreground" /></button>
+          </div>
+          <input value={editData.title || ""} onChange={e => setEditData(p => ({ ...p, title: e.target.value }))} placeholder="Title *" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
+          <div className="flex gap-3">
+            <input value={editData.year || ""} onChange={e => setEditData(p => ({ ...p, year: parseInt(e.target.value) || 0 }))} placeholder="Year" className="px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border w-32" />
+            <input value={editData.genres?.join(", ") || ""} onChange={e => setEditData(p => ({ ...p, genres: e.target.value.split(",").map(g => g.trim()) }))} placeholder="Genres" className="flex-1 px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
+          </div>
+          <textarea value={editData.description || ""} onChange={e => setEditData(p => ({ ...p, description: e.target.value }))} placeholder="Description" rows={2} className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border resize-none" />
+          <input value={editData.poster || ""} onChange={e => setEditData(p => ({ ...p, poster: e.target.value }))} placeholder="Poster URL" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
+          <input value={editData.videoUrl || ""} onChange={e => setEditData(p => ({ ...p, videoUrl: e.target.value }))} placeholder="Video URL" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
+          <input value={editData.trailerUrl || ""} onChange={e => setEditData(p => ({ ...p, trailerUrl: e.target.value }))} placeholder="Trailer URL" className="w-full px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border" />
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input type="checkbox" checked={editData.isVip || false} onChange={e => setEditData(p => ({ ...p, isVip: e.target.checked }))} className="rounded" /> VIP Only
+            </label>
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input type="checkbox" checked={editData.isNew || false} onChange={e => setEditData(p => ({ ...p, isNew: e.target.checked }))} className="rounded" /> Mark as New
+            </label>
+            <select value={editData.status || "published"} onChange={e => setEditData(p => ({ ...p, status: e.target.value as Content["status"] }))} className="px-3 py-2 rounded-md bg-secondary text-foreground text-sm border border-border">
+              <option value="published">Published</option>
+              <option value="agent">Agent</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+          <button onClick={handleUpdate} disabled={saving} className="flex items-center gap-1 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-bold disabled:opacity-50">
+            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-4 h-4" />} Save Changes
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
       ) : (
@@ -131,7 +201,10 @@ const AdminMovies = () => {
                       "bg-secondary text-muted-foreground"
                     }`}>{m.status.replace("_", " ")}</span>
                   </td>
-                  <td className="p-3">
+                  <td className="p-3 flex gap-1">
+                    <button onClick={() => startEdit(m)} className="p-1 rounded hover:bg-primary/20 text-primary transition-colors">
+                      <Pencil className="w-4 h-4" />
+                    </button>
                     <button onClick={() => handleDelete(m.id)} disabled={deleting === m.id} className="p-1 rounded hover:bg-destructive/20 text-destructive transition-colors disabled:opacity-50">
                       {deleting === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                     </button>
