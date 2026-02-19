@@ -36,8 +36,8 @@ const Navbar = () => {
         <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-between h-14">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="VJ SONY" className="w-8 h-8 rounded-full object-cover" />
-              <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">VJ SONY</span>
+              <img src="/logo.png" alt="DWON PA DESTINY" className="w-8 h-8 rounded-full object-cover" />
+              <span className="text-base md:text-lg font-black text-gradient-green tracking-tight leading-tight">DWON PA DESTINY.ONLINE</span>
             </Link>
             <div className="hidden md:flex items-center gap-1">
               {navItems.map((item) => (
