@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (user) await fetchProfile(user.uid);
   };
 
-  const isAdmin = () => profile?.role === "admin" || user?.email === "thevoiceofdestiny0@gmail.com";
+  const isAdmin = () => profile?.role === "admin" || user?.email === "vjsony700@gmail.com";
 
   const hasActiveSubscription = () => {
     if (isAdmin()) return true;
