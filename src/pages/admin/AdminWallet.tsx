@@ -58,17 +58,29 @@ const AdminWallet = () => {
     }
     setWithdrawing(true);
     try {
-      const res = await initiateWithdraw(mobileNumber.trim(), num, "Admin withdrawal");
-      if (res.success) {
+      const res: any = await initiateWithdraw(mobileNumber.trim(), num, "Admin withdrawal");
+      const r = res?.relworx || {};
+      const innerOk = r.success !== false;
+      if (res?.success && innerOk) {
         toast({ title: "Withdrawal initiated", description: `${num.toLocaleString()} UGX to ${mobileNumber}.` });
         setWithdrawAmount("");
         setMobileNumber("");
         loadData();
       } else {
-        toast({ title: "Withdrawal failed", description: res.message || "Try again", variant: "destructive" });
+        const msg =
+          r.message ||
+          r.customer_message ||
+          r.failure_reason ||
+          r.reason ||
+          r.error ||
+          (r.error_code ? `Error: ${r.error_code}` : null) ||
+          res?.message ||
+          res?.error ||
+          "Try again";
+        toast({ title: "Withdrawal failed", description: msg, variant: "destructive" });
       }
-    } catch {
-      toast({ title: "Error", variant: "destructive" });
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.message || "Network error", variant: "destructive" });
     } finally {
       setWithdrawing(false);
     }
