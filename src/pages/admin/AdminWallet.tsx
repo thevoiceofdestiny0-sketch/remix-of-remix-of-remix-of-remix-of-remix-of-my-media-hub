@@ -80,6 +80,7 @@ const AdminWallet = () => {
         setWithdrawStatus("Waiting for withdrawal confirmation...");
 
         let confirmed = false;
+        let resolved = false;
         for (let attempt = 1; attempt <= 300; attempt++) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           const statusRes = await checkStatus(reference);
@@ -87,6 +88,7 @@ const AdminWallet = () => {
 
           if (isTransactionSuccessful(statusRes)) {
             confirmed = true;
+            resolved = true;
             toast({ title: "Withdrawal successful", description: `${num.toLocaleString()} UGX sent to ${mobileNumber}.` });
             setWithdrawAmount("");
             setMobileNumber("");
@@ -96,6 +98,7 @@ const AdminWallet = () => {
           }
 
           if (isTransactionFailed(statusRes)) {
+            resolved = true;
             setWithdrawStatus("");
             toast({ title: "Withdrawal failed", description: getTransactionErrorMessage(statusRes, "Withdrawal failed"), variant: "destructive" });
             break;
@@ -104,7 +107,7 @@ const AdminWallet = () => {
           setWithdrawStatus(status ? `Verifying withdrawal... (${status})` : `Verifying withdrawal... (${attempt}s)`);
         }
 
-        if (!confirmed) {
+        if (!resolved && !confirmed) {
           setWithdrawStatus("");
           toast({ title: "Withdrawal still pending", description: "No final confirmation yet. Please refresh and check transaction history.", variant: "destructive" });
         }
