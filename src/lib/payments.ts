@@ -96,8 +96,8 @@ export function pollPaymentStatus(
   onSuccess: (data: StatusResponse) => void,
   onFail: (msg: string) => void,
   onPoll?: (attempt: number) => void,
-  maxAttempts = 30,
-  intervalMs = 10000
+  maxAttempts = 300,
+  intervalMs = 1000
 ): () => void {
   let attempt = 0;
   const id = setInterval(async () => {
