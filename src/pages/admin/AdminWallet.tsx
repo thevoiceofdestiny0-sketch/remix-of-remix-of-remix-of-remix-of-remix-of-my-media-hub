@@ -5,6 +5,12 @@ import {
   fetchWalletBalance,
   fetchBackendTransactions,
   initiateWithdraw,
+  checkStatus,
+  getTransactionErrorMessage,
+  getTransactionReference,
+  getTransactionStatus,
+  isTransactionFailed,
+  isTransactionSuccessful,
   type BackendTransaction,
 } from "@/lib/payments";
 
@@ -18,6 +24,7 @@ const AdminWallet = () => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawStatus, setWithdrawStatus] = useState<string>("");
 
   const loadData = async () => {
     setLoading(true);
@@ -57,29 +64,56 @@ const AdminWallet = () => {
       return;
     }
     setWithdrawing(true);
+    setWithdrawStatus("Initiating withdrawal...");
     try {
       const res: any = await initiateWithdraw(mobileNumber.trim(), num, "Admin withdrawal");
-      const r = res?.relworx || {};
-      const innerOk = r.success !== false;
-      if (res?.success && innerOk) {
-        toast({ title: "Withdrawal initiated", description: `${num.toLocaleString()} UGX to ${mobileNumber}.` });
+      const reference = getTransactionReference(res);
+      if (isTransactionFailed(res)) {
+        toast({ title: "Withdrawal failed", description: getTransactionErrorMessage(res, "Withdrawal failed"), variant: "destructive" });
+      } else if (isTransactionSuccessful(res)) {
+        toast({ title: "Withdrawal successful", description: `${num.toLocaleString()} UGX sent to ${mobileNumber}.` });
         setWithdrawAmount("");
         setMobileNumber("");
+        setWithdrawStatus("");
         loadData();
+      } else if (reference) {
+        setWithdrawStatus("Waiting for withdrawal confirmation...");
+
+        let confirmed = false;
+        for (let attempt = 1; attempt <= 300; attempt++) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const statusRes = await checkStatus(reference);
+          const status = getTransactionStatus(statusRes);
+
+          if (isTransactionSuccessful(statusRes)) {
+            confirmed = true;
+            toast({ title: "Withdrawal successful", description: `${num.toLocaleString()} UGX sent to ${mobileNumber}.` });
+            setWithdrawAmount("");
+            setMobileNumber("");
+            setWithdrawStatus("");
+            loadData();
+            break;
+          }
+
+          if (isTransactionFailed(statusRes)) {
+            setWithdrawStatus("");
+            toast({ title: "Withdrawal failed", description: getTransactionErrorMessage(statusRes, "Withdrawal failed"), variant: "destructive" });
+            break;
+          }
+
+          setWithdrawStatus(status ? `Verifying withdrawal... (${status})` : `Verifying withdrawal... (${attempt}s)`);
+        }
+
+        if (!confirmed) {
+          setWithdrawStatus("");
+          toast({ title: "Withdrawal still pending", description: "No final confirmation yet. Please refresh and check transaction history.", variant: "destructive" });
+        }
       } else {
-        const msg =
-          r.message ||
-          r.customer_message ||
-          r.failure_reason ||
-          r.reason ||
-          r.error ||
-          (r.error_code ? `Error: ${r.error_code}` : null) ||
-          res?.message ||
-          res?.error ||
-          "Try again";
-        toast({ title: "Withdrawal failed", description: msg, variant: "destructive" });
+        setWithdrawStatus("");
+        toast({ title: "Withdrawal failed", description: getTransactionErrorMessage(res, "No withdrawal reference returned"), variant: "destructive" });
       }
     } catch (e: any) {
+      setWithdrawStatus("");
       toast({ title: "Error", description: e?.message || "Network error", variant: "destructive" });
     } finally {
       setWithdrawing(false);
@@ -145,6 +179,7 @@ const AdminWallet = () => {
               {withdrawing && <Loader2 className="w-3 h-3 animate-spin" />} Withdraw
             </button>
           </div>
+          {withdrawStatus && <p className="text-xs text-muted-foreground">{withdrawStatus}</p>}
           <p className="text-xs text-muted-foreground">Funds will be sent via MTN/Airtel Mobile Money.</p>
         </div>
       </div>
