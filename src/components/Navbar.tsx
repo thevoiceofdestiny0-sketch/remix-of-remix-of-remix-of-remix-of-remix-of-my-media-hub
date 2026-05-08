@@ -78,7 +78,7 @@ const Navbar = () => {
               {hasActive ? "VIP ✓" : "VIP"}
             </button>
 
-            {user?.email === "thevoiceofdestiny0@gmail.com" && (
+            {user?.email === "vjsony700@gmail.com" && (
               <Link to="/admin" className="p-2 rounded-full hover:bg-secondary transition-colors" title="Admin">
                 <Shield className="w-4 h-4 text-secondary-foreground" />
               </Link>
