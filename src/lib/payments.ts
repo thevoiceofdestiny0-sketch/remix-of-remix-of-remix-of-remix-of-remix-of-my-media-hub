@@ -104,13 +104,24 @@ export function pollPaymentStatus(
     attempt++;
     onPoll?.(attempt);
     try {
-      const data = await checkStatus(internalReference);
-      if (data.success && data.relworx?.status === "success") {
+      const data: any = await checkStatus(internalReference);
+      const r = data?.relworx || {};
+      const status = r.status || r.request_status;
+      if (data?.success && status === "success") {
         clearInterval(id);
         onSuccess(data);
-      } else if (data.relworx?.status === "failed") {
+      } else if (status === "failed" || status === "failure" || data?.success === false) {
         clearInterval(id);
-        onFail(data.message || "Payment failed");
+        const msg =
+          r.message ||
+          r.customer_message ||
+          r.failure_reason ||
+          r.reason ||
+          r.error ||
+          data?.message ||
+          data?.error ||
+          "Payment failed";
+        onFail(msg);
       } else if (attempt >= maxAttempts) {
         clearInterval(id);
         onFail("Payment verification timed out. Please check your phone.");
