@@ -6,8 +6,19 @@ const API_BASE = "https://api.thevoiceofdestiny0.workers.dev/api";
 interface RelworxResult {
   internal_reference?: string;
   status?: string;
+  request_status?: string;
   amount?: number;
   msisdn?: string;
+  success?: boolean;
+  provider?: string;
+  provider_transaction_id?: string;
+  completed_at?: string;
+  message?: string;
+  customer_message?: string;
+  failure_reason?: string;
+  reason?: string;
+  error?: string;
+  error_code?: string;
 }
 
 interface DepositResponse {
@@ -18,13 +29,47 @@ interface DepositResponse {
 
 interface StatusResponse {
   success: boolean;
-  relworx?: RelworxResult & {
-    request_status?: string;
-    provider?: string;
-    provider_transaction_id?: string;
-    completed_at?: string;
-  };
+  relworx?: RelworxResult;
   message?: string;
+}
+
+const SUCCESS_STATUSES = new Set(["success", "successful", "completed", "complete", "approved", "paid"]);
+const FAILURE_STATUSES = new Set(["failed", "failure", "cancelled", "canceled", "rejected", "declined", "error", "expired"]);
+
+export function getTransactionReference(data: any): string | undefined {
+  return data?.relworx?.internal_reference || data?.internal_reference;
+}
+
+export function getTransactionStatus(data: any): string {
+  const rawStatus = data?.relworx?.status || data?.relworx?.request_status || data?.status || data?.request_status || "";
+  return String(rawStatus).trim().toLowerCase();
+}
+
+export function getTransactionErrorMessage(data: any, fallback = "Payment failed"): string {
+  const r = data?.relworx || {};
+  return (
+    r.message ||
+    r.customer_message ||
+    r.failure_reason ||
+    r.reason ||
+    r.error ||
+    (r.error_code ? `Error: ${r.error_code}` : null) ||
+    data?.message ||
+    data?.error ||
+    fallback
+  );
+}
+
+export function isTransactionSuccessful(data: any): boolean {
+  const status = getTransactionStatus(data);
+  const r = data?.relworx || {};
+  return SUCCESS_STATUSES.has(status) || (!!data?.success && r.success === true && !!r.completed_at);
+}
+
+export function isTransactionFailed(data: any): boolean {
+  const status = getTransactionStatus(data);
+  const r = data?.relworx || {};
+  return FAILURE_STATUSES.has(status) || data?.success === false || r.success === false;
 }
 
 export interface WalletBalanceResponse {
@@ -105,23 +150,12 @@ export function pollPaymentStatus(
     onPoll?.(attempt);
     try {
       const data: any = await checkStatus(internalReference);
-      const r = data?.relworx || {};
-      const status = r.status || r.request_status;
-      if (data?.success && status === "success") {
+      if (isTransactionSuccessful(data)) {
         clearInterval(id);
         onSuccess(data);
-      } else if (status === "failed" || status === "failure" || data?.success === false) {
+      } else if (isTransactionFailed(data)) {
         clearInterval(id);
-        const msg =
-          r.message ||
-          r.customer_message ||
-          r.failure_reason ||
-          r.reason ||
-          r.error ||
-          data?.message ||
-          data?.error ||
-          "Payment failed";
-        onFail(msg);
+        onFail(getTransactionErrorMessage(data));
       } else if (attempt >= maxAttempts) {
         clearInterval(id);
         onFail("Payment verification timed out. Please check your phone.");
