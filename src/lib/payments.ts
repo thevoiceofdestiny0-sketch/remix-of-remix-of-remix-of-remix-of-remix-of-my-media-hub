@@ -5,14 +5,17 @@ const API_BASE = "https://api.thevoiceofdestiny0.workers.dev/api";
 
 interface RelworxResult {
   internal_reference?: string;
+  customer_reference?: string;
   status?: string;
   request_status?: string;
   amount?: number;
   msisdn?: string;
   success?: boolean;
   provider?: string;
+  transaction_type?: string;
   provider_transaction_id?: string;
   completed_at?: string;
+  created_at?: string;
   message?: string;
   customer_message?: string;
   failure_reason?: string;
@@ -37,11 +40,16 @@ const SUCCESS_STATUSES = new Set(["success", "successful", "completed", "complet
 const FAILURE_STATUSES = new Set(["failed", "failure", "cancelled", "canceled", "rejected", "declined", "error", "expired"]);
 
 export function getTransactionReference(data: any): string | undefined {
-  return data?.relworx?.internal_reference || data?.internal_reference;
+  return data?.relworx?.internal_reference || data?.relworx?.customer_reference || data?.internal_reference || data?.customer_reference;
 }
 
 export function getTransactionStatus(data: any): string {
   const rawStatus = data?.relworx?.status || data?.relworx?.request_status || data?.status || data?.request_status || "";
+  return String(rawStatus).trim().toLowerCase();
+}
+
+export function getBackendTransactionStatus(transaction: BackendTransaction | null | undefined): string {
+  const rawStatus = transaction?.status || transaction?.request_status || "";
   return String(rawStatus).trim().toLowerCase();
 }
 
@@ -60,6 +68,17 @@ export function getTransactionErrorMessage(data: any, fallback = "Payment failed
   );
 }
 
+export function getBackendTransactionErrorMessage(transaction: BackendTransaction | null | undefined, fallback = "Payment failed"): string {
+  return (
+    transaction?.message ||
+    transaction?.failure_reason ||
+    transaction?.reason ||
+    transaction?.error ||
+    (transaction?.error_code ? `Error: ${transaction.error_code}` : null) ||
+    fallback
+  );
+}
+
 export function isTransactionSuccessful(data: any): boolean {
   const status = getTransactionStatus(data);
   const r = data?.relworx || {};
@@ -70,6 +89,14 @@ export function isTransactionFailed(data: any): boolean {
   const status = getTransactionStatus(data);
   const r = data?.relworx || {};
   return FAILURE_STATUSES.has(status) || data?.success === false || r.success === false;
+}
+
+export function isBackendTransactionSuccessful(transaction: BackendTransaction | null | undefined): boolean {
+  return SUCCESS_STATUSES.has(getBackendTransactionStatus(transaction));
+}
+
+export function isBackendTransactionFailed(transaction: BackendTransaction | null | undefined): boolean {
+  return FAILURE_STATUSES.has(getBackendTransactionStatus(transaction));
 }
 
 export interface WalletBalanceResponse {
@@ -83,12 +110,64 @@ export interface WalletBalanceResponse {
 export interface BackendTransaction {
   id?: string;
   internal_reference?: string;
+  customer_reference?: string;
   amount?: number;
   msisdn?: string;
   status?: string;
+  request_status?: string;
   type?: string;
+  transaction_type?: string;
   created_at?: string;
+  message?: string;
+  failure_reason?: string;
+  reason?: string;
+  error?: string;
+  error_code?: string;
   [key: string]: any;
+}
+
+function normalizeMsisdn(msisdn: string | undefined): string {
+  return String(msisdn || "").replace(/[^\d+]/g, "").trim();
+}
+
+export function findMatchingTransaction(
+  transactions: BackendTransaction[],
+  {
+    reference,
+    msisdn,
+    amount,
+    type,
+  }: {
+    reference?: string;
+    msisdn?: string;
+    amount?: number;
+    type?: string;
+  }
+): BackendTransaction | undefined {
+  const normalizedReference = String(reference || "").trim().toLowerCase();
+  const normalizedMsisdn = normalizeMsisdn(msisdn);
+  const normalizedType = String(type || "").trim().toLowerCase();
+
+  const byReference = normalizedReference
+    ? transactions.find((transaction) =>
+        [transaction.internal_reference, transaction.customer_reference, transaction.id]
+          .filter(Boolean)
+          .some((candidate) => String(candidate).trim().toLowerCase() === normalizedReference)
+      )
+    : undefined;
+
+  if (byReference) {
+    return byReference;
+  }
+
+  return transactions.find((transaction) => {
+    const transactionType = String(transaction.transaction_type || transaction.type || "").trim().toLowerCase();
+    const sameType = normalizedType ? transactionType === normalizedType : true;
+    const sameMsisdn = normalizedMsisdn ? normalizeMsisdn(transaction.msisdn) === normalizedMsisdn : true;
+    const sameAmount = typeof amount === "number" ? Number(transaction.amount || 0) === amount : true;
+
+    return sameType && sameMsisdn && sameAmount;
+  });
 }
 
 export interface TransactionsResponse {

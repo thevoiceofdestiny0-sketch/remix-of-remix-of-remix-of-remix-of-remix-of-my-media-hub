@@ -6,9 +6,14 @@ import {
   fetchBackendTransactions,
   initiateWithdraw,
   checkStatus,
+  findMatchingTransaction,
+  getBackendTransactionErrorMessage,
+  getBackendTransactionStatus,
   getTransactionErrorMessage,
   getTransactionReference,
   getTransactionStatus,
+  isBackendTransactionFailed,
+  isBackendTransactionSuccessful,
   isTransactionFailed,
   isTransactionSuccessful,
   type BackendTransaction,
@@ -79,35 +84,75 @@ const AdminWallet = () => {
       } else if (reference) {
         setWithdrawStatus("Waiting for withdrawal confirmation...");
 
-        let confirmed = false;
         let resolved = false;
         for (let attempt = 1; attempt <= 300; attempt++) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
-          const statusRes = await checkStatus(reference);
-          const status = getTransactionStatus(statusRes);
+          let latestStatus = "";
 
-          if (isTransactionSuccessful(statusRes)) {
-            confirmed = true;
-            resolved = true;
-            toast({ title: "Withdrawal successful", description: `${num.toLocaleString()} UGX sent to ${mobileNumber}.` });
-            setWithdrawAmount("");
-            setMobileNumber("");
-            setWithdrawStatus("");
-            loadData();
-            break;
+          try {
+            const statusRes = await checkStatus(reference);
+            latestStatus = getTransactionStatus(statusRes);
+
+            if (isTransactionSuccessful(statusRes)) {
+              resolved = true;
+              toast({ title: "Withdrawal successful", description: `${num.toLocaleString()} UGX sent to ${mobileNumber}.` });
+              setWithdrawAmount("");
+              setMobileNumber("");
+              setWithdrawStatus("");
+              loadData();
+              break;
+            }
+
+            if (isTransactionFailed(statusRes)) {
+              resolved = true;
+              setWithdrawStatus("");
+              toast({ title: "Withdrawal failed", description: getTransactionErrorMessage(statusRes, "Withdrawal failed"), variant: "destructive" });
+              break;
+            }
+          } catch {
+            latestStatus = "";
           }
 
-          if (isTransactionFailed(statusRes)) {
-            resolved = true;
-            setWithdrawStatus("");
-            toast({ title: "Withdrawal failed", description: getTransactionErrorMessage(statusRes, "Withdrawal failed"), variant: "destructive" });
-            break;
+          try {
+            const txRes = await fetchBackendTransactions();
+            const matchingTx = findMatchingTransaction(txRes.relworx?.transactions || [], {
+              reference,
+              msisdn: mobileNumber.trim(),
+              amount: num,
+              type: "payout",
+            });
+
+            if (matchingTx) {
+              const transactionStatus = getBackendTransactionStatus(matchingTx);
+              latestStatus = transactionStatus || latestStatus;
+
+              if (isBackendTransactionSuccessful(matchingTx)) {
+                resolved = true;
+                setTransactions(txRes.relworx?.transactions || []);
+                toast({ title: "Withdrawal successful", description: `${num.toLocaleString()} UGX sent to ${mobileNumber}.` });
+                setWithdrawAmount("");
+                setMobileNumber("");
+                setWithdrawStatus("");
+                loadData();
+                break;
+              }
+
+              if (isBackendTransactionFailed(matchingTx)) {
+                resolved = true;
+                setTransactions(txRes.relworx?.transactions || []);
+                setWithdrawStatus("");
+                toast({ title: "Withdrawal failed", description: getBackendTransactionErrorMessage(matchingTx, "Withdrawal failed"), variant: "destructive" });
+                break;
+              }
+            }
+          } catch {
+            // ignore transaction refresh errors while continuing polling
           }
 
-          setWithdrawStatus(status ? `Verifying withdrawal... (${status})` : `Verifying withdrawal... (${attempt}s)`);
+          setWithdrawStatus(latestStatus ? `Verifying withdrawal... (${latestStatus})` : `Verifying withdrawal... (${attempt}s)`);
         }
 
-        if (!resolved && !confirmed) {
+        if (!resolved) {
           setWithdrawStatus("");
           toast({ title: "Withdrawal still pending", description: "No final confirmation yet. Please refresh and check transaction history.", variant: "destructive" });
         }
