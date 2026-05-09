@@ -15,7 +15,7 @@ const Movies = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
-      <main className="pt-20 max-w-[1400px] mx-auto px-4 pb-12">
+      <main className="pt-20 max-w-[1800px] mx-auto px-4 pb-12">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">Movies</h1>
           <input

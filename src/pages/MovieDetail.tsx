@@ -84,7 +84,7 @@ const MovieDetail = () => {
         </button>
 
         {/* Content overlay */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 max-w-[1400px] mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 max-w-[1800px] mx-auto">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             {content.isVip && (
               <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-badge-vip text-primary-foreground">VIP</span>
@@ -159,7 +159,7 @@ const MovieDetail = () => {
 
 
       {/* Related */}
-      <div className="max-w-[1400px] mx-auto px-4 py-6">
+      <div className="max-w-[1800px] mx-auto px-4 py-6">
         <h2 className="text-lg font-bold text-foreground mb-4">Related {content.type === 'series' ? 'Series' : 'Movies'}</h2>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
           {relatedContent.map(item => (

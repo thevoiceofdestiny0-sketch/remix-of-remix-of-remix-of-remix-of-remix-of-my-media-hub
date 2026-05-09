@@ -26,18 +26,18 @@ const HeroBanner = () => {
   const linkTo = currentSlide?.linkTo || "";
 
   return (
-    <section className="relative w-full h-[200px] md:h-[320px] overflow-hidden">
+    <section className="relative w-full h-[240px] md:h-[420px] lg:h-[480px] overflow-hidden bg-background">
       <img
         src={imageUrl}
         alt={title || "Featured"}
-        className="w-full h-full object-cover object-top transition-all duration-700"
+        className="w-full h-full object-contain md:object-cover object-center transition-all duration-700"
         key={activeIndex}
       />
       <div className="absolute inset-0 hero-gradient" />
 
       {/* Text overlay */}
       {title && (
-        <div className="hidden md:block absolute bottom-4 left-0 px-4 max-w-[1400px] mx-auto w-full">
+        <div className="hidden md:block absolute bottom-4 left-0 px-4 max-w-[1800px] mx-auto w-full">
           <div className="max-w-sm animate-fade-in">
             <h1 className="text-lg font-black text-foreground mb-1 leading-tight">
               {title}

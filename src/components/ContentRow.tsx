@@ -23,7 +23,7 @@ const ContentRow = ({ title, movies, showRank, categoryLink, loading }: ContentR
 
   return (
     <section className="mb-8">
-      <div className="flex items-center justify-between mb-3 px-4 max-w-[1400px] mx-auto">
+      <div className="flex items-center justify-between mb-3 px-4 max-w-[1800px] mx-auto">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-primary">{title}</h2>
           {categoryLink && (
@@ -49,7 +49,7 @@ const ContentRow = ({ title, movies, showRank, categoryLink, loading }: ContentR
       </div>
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scrollbar-hide px-4 max-w-[1400px] mx-auto"
+        className="flex gap-3 overflow-x-auto scrollbar-hide px-4 max-w-[1800px] mx-auto"
       >
         {loading
           ? Array.from({ length: 8 }).map((_, i) => (

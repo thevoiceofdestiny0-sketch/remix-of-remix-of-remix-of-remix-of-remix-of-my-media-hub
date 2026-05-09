@@ -25,7 +25,7 @@ const Browse = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
-      <main className="pt-20 max-w-[1400px] mx-auto px-4 pb-12">
+      <main className="pt-20 max-w-[1800px] mx-auto px-4 pb-12">
         <div className="flex items-center gap-3 mb-6">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
