@@ -58,7 +58,7 @@ const Watch = () => {
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
 
-      <div className="mt-14 max-w-[1400px] mx-auto px-4 py-4">
+      <div className="mt-14 max-w-[1800px] mx-auto px-4 py-4">
         {/* Player + Episodes Side Panel */}
         <div className={`flex gap-3 ${isSeries ? '' : ''}`}>
           {/* Video Player - smaller */}

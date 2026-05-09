@@ -37,7 +37,7 @@ const HeroBanner = () => {
 
       {/* Text overlay */}
       {title && (
-        <div className="hidden md:block absolute bottom-4 left-0 px-4 max-w-[1400px] mx-auto w-full">
+        <div className="hidden md:block absolute bottom-4 left-0 px-4 max-w-[1800px] mx-auto w-full">
           <div className="max-w-sm animate-fade-in">
             <h1 className="text-lg font-black text-foreground mb-1 leading-tight">
               {title}

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const GenreTags = () => {
   return (
-    <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 max-w-[1400px] mx-auto mb-8">
+    <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 max-w-[1800px] mx-auto mb-8">
       {genreTags.map((tag) => (
         <Link
           key={tag}
