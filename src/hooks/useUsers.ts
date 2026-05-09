@@ -5,11 +5,11 @@ import {
   doc,
   updateDoc,
   deleteDoc,
-  addDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { UserProfile } from "@/contexts/AuthContext";
+import { fetchBackendTransactions, type BackendTransaction } from "@/lib/payments";
 
 export interface Transaction {
   id: string;
@@ -20,6 +20,37 @@ export interface Transaction {
   plan?: string;
   date: string;
   status: "completed" | "pending" | "failed";
+  msisdn?: string;
+  reference?: string;
+  raw?: BackendTransaction;
+}
+
+const SUCCESS = new Set(["success", "successful", "completed", "complete", "approved", "paid"]);
+const FAIL = new Set(["failed", "failure", "cancelled", "canceled", "rejected", "declined", "error", "expired"]);
+
+function mapBackendTx(tx: BackendTransaction, users: UserProfile[]): Transaction {
+  const rawStatus = String(tx.status || tx.request_status || "").toLowerCase();
+  const status: Transaction["status"] = SUCCESS.has(rawStatus)
+    ? "completed"
+    : FAIL.has(rawStatus)
+    ? "failed"
+    : "pending";
+  const txType = String(tx.transaction_type || tx.type || "").toLowerCase();
+  const isPayout = txType.includes("payout") || txType.includes("withdraw");
+  const matchedUser = users.find((u) => (u as any).msisdn && (u as any).msisdn === tx.msisdn);
+  return {
+    id: tx.internal_reference || tx.id || tx.customer_reference || crypto.randomUUID(),
+    userId: matchedUser?.uid || "",
+    userName: matchedUser?.name || tx.msisdn || "Unknown",
+    type: isPayout ? "wallet_withdraw" : "wallet_topup",
+    amount: Number(tx.amount || 0),
+    plan: undefined,
+    date: tx.created_at || new Date().toISOString(),
+    status,
+    msisdn: tx.msisdn,
+    reference: tx.internal_reference || tx.customer_reference,
+    raw: tx,
+  };
 }
 
 export const useUsers = () => {
@@ -32,7 +63,7 @@ export const useUsers = () => {
       const snap = await getDocs(collection(db, "users"));
       setUsers(snap.docs.map((d) => ({ ...d.data() } as UserProfile)));
     } catch (e) {
-      console.error(e);
+      console.error("Failed to load users", e);
     } finally {
       setLoading(false);
     }
@@ -45,23 +76,38 @@ export const useUsers = () => {
 export const useTransactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchTx = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const snap = await getDocs(collection(db, "transactions"));
-      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Transaction));
+      // Pull users in parallel so we can label transactions with user names
+      const [usersSnap, txRes] = await Promise.all([
+        getDocs(collection(db, "users")).catch(() => null),
+        fetchBackendTransactions(),
+      ]);
+      const users: UserProfile[] = usersSnap
+        ? usersSnap.docs.map((d) => ({ ...d.data() } as UserProfile))
+        : [];
+
+      if (!txRes?.success || !txRes.relworx?.transactions) {
+        throw new Error("Backend returned no transactions");
+      }
+      const items = txRes.relworx.transactions.map((t) => mapBackendTx(t, users));
       items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       setTransactions(items);
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error("Failed to load transactions", e);
+      setError(e?.message || "Failed to load transactions");
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => { fetchTx(); }, []);
-  return { transactions, loading, refetch: fetchTx };
+  return { transactions, loading, error, refetch: fetchTx };
 };
 
 // Admin: activate subscription for a user
