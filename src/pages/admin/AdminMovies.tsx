@@ -80,8 +80,8 @@ const AdminMovies = () => {
       setTitle(""); setPosterUrl(""); setVideoUrl(""); setDescription(""); setTrailerUrl("");
       setShowForm(false);
       refetch();
-    } catch {
-      toast({ title: "Error adding movie", variant: "destructive" });
+    } catch (e: any) {
+      toast({ title: "Error adding movie", description: e?.message || String(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }
