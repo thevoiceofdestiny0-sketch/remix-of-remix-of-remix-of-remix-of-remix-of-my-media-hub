@@ -29,7 +29,7 @@ const Index = () => {
         <HeroBanner />
         <div className="py-4">
           {/* Genre Filter */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 max-w-[1800px] mx-auto mb-6">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-4 w-full mx-auto mb-6">
             {genreTags.map((tag) => (
               <button
                 key={tag}
@@ -46,7 +46,7 @@ const Index = () => {
           </div>
 
           {/* Content Grid */}
-          <div className="px-4 max-w-[1800px] mx-auto">
+          <div className="px-4 w-full mx-auto">
             {loading ? (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3">
                 {Array.from({ length: 14 }).map((_, i) => (
