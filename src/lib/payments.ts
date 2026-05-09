@@ -1,7 +1,7 @@
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-const API_BASE = "https://api.thevoiceofdestiny0.workers.dev/api";
+const API_BASE = "https://function-bun-production-be1e.up.railway.app/api";
 
 interface RelworxResult {
   internal_reference?: string;
@@ -193,7 +193,7 @@ export async function fetchBackendTransactions(): Promise<TransactionsResponse> 
 }
 
 export async function initiateDeposit(msisdn: string, amount: number, description: string): Promise<DepositResponse> {
-  const res = await fetch(`${API_BASE}/request-payment`, {
+  const res = await fetch(`${API_BASE}/deposit`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ msisdn, amount, description }),
@@ -202,7 +202,7 @@ export async function initiateDeposit(msisdn: string, amount: number, descriptio
 }
 
 export async function initiateWithdraw(msisdn: string, amount: number, description: string) {
-  const res = await fetch(`${API_BASE}/send-payment`, {
+  const res = await fetch(`${API_BASE}/withdraw`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ msisdn, amount, description }),
