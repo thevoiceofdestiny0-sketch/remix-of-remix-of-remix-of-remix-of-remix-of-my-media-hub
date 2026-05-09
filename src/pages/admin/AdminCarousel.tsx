@@ -35,8 +35,8 @@ const AdminCarousel = () => {
       setLinkTo("");
       setOrder(slides.length);
       refetch();
-    } catch {
-      toast({ title: "Error adding slide", variant: "destructive" });
+    } catch (e: any) {
+      toast({ title: "Error adding slide", description: e?.message || String(e), variant: "destructive" });
     } finally {
       setAdding(false);
     }
