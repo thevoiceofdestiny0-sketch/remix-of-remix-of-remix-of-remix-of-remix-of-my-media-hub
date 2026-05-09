@@ -26,7 +26,7 @@ const Agent = () => {
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Navbar />
-      <main className="pt-16 max-w-[1800px] mx-auto px-4 pb-12">
+      <main className="pt-16 w-full mx-auto px-4 pb-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">

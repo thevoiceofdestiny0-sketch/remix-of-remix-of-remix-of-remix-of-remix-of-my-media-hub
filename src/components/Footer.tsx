@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="border-t border-border mt-12 py-8">
-      <div className="max-w-[1800px] mx-auto px-4">
+      <div className="w-full mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <span className="text-lg font-black text-gradient-green">DWON PA DESTINY</span>
