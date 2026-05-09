@@ -133,8 +133,18 @@ export const useContentById = (id: string) => {
   return { content, loading };
 };
 
+// Firestore rejects `undefined` values — strip them before writing
+const stripUndefined = <T extends Record<string, any>>(obj: T): Partial<T> => {
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) out[k] = v;
+  }
+  return out as Partial<T>;
+};
+
 export const addContent = async (data: Omit<Content, "id">) => {
-  const ref = await addDoc(collection(db, "content"), { ...data, createdAt: serverTimestamp() });
+  const clean = stripUndefined(data);
+  const ref = await addDoc(collection(db, "content"), { ...clean, createdAt: serverTimestamp() });
   return ref.id;
 };
 
@@ -143,7 +153,7 @@ export const updateContentStatus = async (id: string, status: ContentStatus) => 
 };
 
 export const updateContent = async (id: string, data: Partial<Omit<Content, "id">>) => {
-  await updateDoc(doc(db, "content", id), data);
+  await updateDoc(doc(db, "content", id), stripUndefined(data) as any);
 };
 
 export const deleteContent = async (id: string) => {
