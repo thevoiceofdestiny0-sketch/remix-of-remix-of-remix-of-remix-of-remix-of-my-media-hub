@@ -45,8 +45,8 @@ const AdminSeries = () => {
       toast({ title: "Series updated" });
       setEditingId(null);
       refetch();
-    } catch {
-      toast({ title: "Error updating series", variant: "destructive" });
+    } catch (e: any) {
+      toast({ title: "Error updating series", description: e?.message || String(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }
