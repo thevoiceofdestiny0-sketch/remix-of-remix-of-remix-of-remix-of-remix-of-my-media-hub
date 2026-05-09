@@ -75,8 +75,8 @@ const AdminSeries = () => {
       setTitle(""); setPosterUrl(""); setDescription("");
       setShowForm(false);
       refetch();
-    } catch {
-      toast({ title: "Error adding series", variant: "destructive" });
+    } catch (e: any) {
+      toast({ title: "Error adding series", description: e?.message || String(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }
