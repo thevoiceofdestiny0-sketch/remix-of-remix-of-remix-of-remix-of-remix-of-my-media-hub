@@ -153,7 +153,7 @@ export const updateContentStatus = async (id: string, status: ContentStatus) => 
 };
 
 export const updateContent = async (id: string, data: Partial<Omit<Content, "id">>) => {
-  await updateDoc(doc(db, "content", id), data);
+  await updateDoc(doc(db, "content", id), stripUndefined(data) as any);
 };
 
 export const deleteContent = async (id: string) => {
